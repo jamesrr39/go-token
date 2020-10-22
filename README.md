@@ -2,6 +2,8 @@
 
 go-token is a package (and sub-packages) providing functions for getting up and running with long-term access tokens.
 
+try it out with the [./examples](examples) folder, e.g.: `go run examples/simple_no_db/simple-no-db-main.go`
+
 ## For root tokens (one "master" token)
 
 - Small program to generate a base64-encoded root token and the base64 encoded hash for it

@@ -9,13 +9,13 @@ import (
 	"github.com/jamesrr39/goutil/errorsx"
 )
 
-type TokensStore struct{}
+type TokenStore struct{}
 
-func NewTokensStore() *TokensStore {
-	return &TokensStore{}
+func NewTokenStore() *TokenStore {
+	return &TokenStore{}
 }
 
-func (s *TokensStore) CreateToken(tx *sql.Tx, accountID int64) (*gotoken.Token, errorsx.Error) {
+func (s *TokenStore) CreateToken(tx *sql.Tx, accountID int64) (*gotoken.Token, errorsx.Error) {
 	var err error
 
 	token := &gotoken.Token{
@@ -38,7 +38,7 @@ func (s *TokensStore) CreateToken(tx *sql.Tx, accountID int64) (*gotoken.Token, 
 	return token, nil
 }
 
-func DefaultCreateTokenFunc(db *sql.DB, tokenStore *TokensStore) webservice.CreateTokenFunc {
+func DefaultCreateTokenFunc(db *sql.DB, tokenStore *TokenStore) webservice.CreateTokenFunc {
 	return func(accountID int64) (*gotoken.Token, errorsx.Error) {
 		tx, err := db.Begin()
 		if err != nil {
