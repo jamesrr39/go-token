@@ -1,0 +1,14 @@
+# go-token
+
+go-token is a package (and sub-packages) providing functions for getting up and running with long-term access tokens.
+
+## For root tokens (one "master" token)
+
+- Small program to generate a base64-encoded root token and the base64 encoded hash for it
+- It provides a middleware for authorizing root tokens
+
+## For auth tokens (many tokens)
+
+- Web service to create auth tokens
+- Middleware for authorizing token
+- Helper functions for retrieving token ID and account ID from the request context
