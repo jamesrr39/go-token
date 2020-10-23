@@ -66,6 +66,7 @@ func TestAuthMiddleWare(t *testing.T) {
 
 		var receivedTokenID int64
 		var receivedAccountID int64
+		var receivedRoleIDs []int64
 		nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
@@ -76,14 +77,18 @@ func TestAuthMiddleWare(t *testing.T) {
 
 			receivedAccountID, err = GetAccountIDFromCtx(ctx)
 			require.NoError(t, err)
+
+			receivedRoleIDs, err = GetRoleIDsFromCtx(ctx)
+			require.NoError(t, err)
 		})
 
 		handler := mw(nextHandler)
 
 		expectedTokenID := int64(10001)
 		expectedAccountID := int64(40)
+		expectedRoleIDs := []int64{1, 54, 10}
 
-		token := gotoken.NewToken(expectedTokenID, expectedAccountID, time.Time{})
+		token := gotoken.NewToken(expectedTokenID, expectedAccountID, expectedRoleIDs, time.Time{})
 		jwtToken, err := token.ToJWTToken(hmacSecret)
 		require.NoError(t, err)
 
@@ -99,5 +104,7 @@ func TestAuthMiddleWare(t *testing.T) {
 		require.Equal(t, http.StatusOK, w.Code)
 		assert.Equal(t, expectedTokenID, receivedTokenID)
 		assert.Equal(t, expectedAccountID, receivedAccountID)
+		assert.Equal(t, expectedRoleIDs, receivedRoleIDs)
+
 	})
 }

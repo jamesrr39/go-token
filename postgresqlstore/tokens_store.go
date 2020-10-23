@@ -7,6 +7,7 @@ import (
 	gotoken "github.com/jamesrr39/go-token"
 	"github.com/jamesrr39/go-token/webservice"
 	"github.com/jamesrr39/goutil/errorsx"
+	"github.com/lib/pq"
 )
 
 type TokenStore struct{}
@@ -15,7 +16,7 @@ func NewTokenStore() *TokenStore {
 	return &TokenStore{}
 }
 
-func (s *TokenStore) CreateToken(tx *sql.Tx, accountID int64) (*gotoken.Token, errorsx.Error) {
+func (s *TokenStore) CreateToken(tx *sql.Tx, accountID int64, roleIDs []int64) (*gotoken.Token, errorsx.Error) {
 	var err error
 
 	token := &gotoken.Token{
@@ -25,9 +26,10 @@ func (s *TokenStore) CreateToken(tx *sql.Tx, accountID int64) (*gotoken.Token, e
 
 	row := tx.QueryRow(`
 		INSERT INTO tokens (account_id, created_at)
-		VALUES ($1, $2) RETURNING id`,
+		VALUES ($1, $2, $3) RETURNING id`,
 		accountID,
 		token.CreatedAt,
+		pq.Array(roleIDs),
 	)
 
 	err = row.Scan(&token.ID)
@@ -39,14 +41,14 @@ func (s *TokenStore) CreateToken(tx *sql.Tx, accountID int64) (*gotoken.Token, e
 }
 
 func DefaultCreateTokenFunc(db *sql.DB, tokenStore *TokenStore) webservice.CreateTokenFunc {
-	return func(accountID int64) (*gotoken.Token, errorsx.Error) {
+	return func(accountID int64, roleIDs []int64) (*gotoken.Token, errorsx.Error) {
 		tx, err := db.Begin()
 		if err != nil {
 			return nil, errorsx.Wrap(err)
 		}
 		defer tx.Rollback()
 
-		token, err := tokenStore.CreateToken(tx, accountID)
+		token, err := tokenStore.CreateToken(tx, accountID, roleIDs)
 		if err != nil {
 			return nil, errorsx.Wrap(err)
 		}

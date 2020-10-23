@@ -10,6 +10,7 @@ CREATE TABLE accounts (
 CREATE TABLE tokens (
     id SERIAL PRIMARY KEY,
     account_id BIGINT NOT NULL REFERENCES accounts(id),
+    role_ids INTEGER[] NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     revoked_at TIMESTAMP WITHOUT TIME ZONE
 );`

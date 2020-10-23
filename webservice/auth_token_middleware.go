@@ -49,9 +49,14 @@ func AuthTokenMiddleWare(logger *logpkg.Logger, hmacSecret []byte) func(http.Han
 			// float64 -> int64
 			id := int64(claims[gotoken.JwtIDKey].(float64))
 			accountID := int64(claims[gotoken.JwtAccountIDKey].(float64))
+			var roleIDs []int64
+			for _, roleIDInterface := range claims[gotoken.JwtRoleIDsKey].([]interface{}) {
+				roleIDs = append(roleIDs, int64(roleIDInterface.(float64)))
+			}
 
 			ctx = context.WithValue(ctx, tokenIDCtxKey, id)
 			ctx = context.WithValue(ctx, tokenAccountIDCtxKey, accountID)
+			ctx = context.WithValue(ctx, tokenRoleIDsCtxKey, roleIDs)
 
 			r = r.WithContext(ctx)
 
@@ -69,6 +74,7 @@ type ctxKey struct {
 var (
 	tokenIDCtxKey        = ctxKey{Name: "TokenID"}
 	tokenAccountIDCtxKey = ctxKey{Name: "AccountID"}
+	tokenRoleIDsCtxKey   = ctxKey{Name: "RoleIDs"}
 )
 
 func GetIDFromCtx(ctx context.Context) (int64, errorsx.Error) {
@@ -87,4 +93,28 @@ func GetAccountIDFromCtx(ctx context.Context) (int64, errorsx.Error) {
 	}
 
 	return val.(int64), nil
+}
+
+func GetRoleIDsFromCtx(ctx context.Context) ([]int64, errorsx.Error) {
+	val := ctx.Value(tokenRoleIDsCtxKey)
+	if val == nil {
+		return nil, errorsx.Errorf("no tokenRoleIDsCtxKey found on context")
+	}
+
+	return val.([]int64), nil
+}
+
+func HasRoleID(ctx context.Context, roleID int64) (bool, errorsx.Error) {
+	roleIDs, err := GetRoleIDsFromCtx(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	for _, roleIDOnCtx := range roleIDs {
+		if roleID == roleIDOnCtx {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

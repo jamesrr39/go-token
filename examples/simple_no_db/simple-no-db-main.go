@@ -44,7 +44,7 @@ func main() {
 		// no save to database here, just create a jwt token
 		tokenID := atomic.AddUint64(&lastTokenID, 1)
 
-		token := gotoken.NewToken(int64(tokenID), accountID, time.Now())
+		token := gotoken.NewToken(int64(tokenID), accountID, nil, time.Now())
 		log.Printf("created token: %#v\n", token)
 
 		return token, nil

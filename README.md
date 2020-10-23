@@ -6,7 +6,7 @@ try it out with the [./examples](examples) folder, e.g.: `go run examples/simple
 
 ## For root tokens (one "master" token)
 
-- Small program to generate a base64-encoded root token and the base64 encoded hash for it
+- [./scripts/create-root-token/create-root-token-main.go](Small program) to generate a base64-encoded root token and the base64 encoded hash for it
 - It provides a middleware for authorizing root tokens
 
 ## For auth tokens (many tokens)

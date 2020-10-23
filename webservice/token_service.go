@@ -18,7 +18,7 @@ type TokenService struct {
 	chi.Router
 }
 
-type CreateTokenFunc func(accountID int64) (*gotoken.Token, errorsx.Error)
+type CreateTokenFunc func(accountID int64, roleIDs []int64) (*gotoken.Token, errorsx.Error)
 
 func NewTokenService(logger *logpkg.Logger, createTokenFunc CreateTokenFunc, hmacSecret []byte) *TokenService {
 	ts := &TokenService{logger, createTokenFunc, hmacSecret, chi.NewRouter()}
@@ -30,7 +30,8 @@ func NewTokenService(logger *logpkg.Logger, createTokenFunc CreateTokenFunc, hma
 
 func (s *TokenService) handlePost(w http.ResponseWriter, r *http.Request) {
 	type requestBodyType struct {
-		AccountID int64 `json:"accountId"`
+		AccountID int64   `json:"accountId"`
+		RoleIDs   []int64 `json:"roleIds"`
 	}
 
 	var requestBody requestBodyType
@@ -40,7 +41,7 @@ func (s *TokenService) handlePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := s.createTokenFunc(requestBody.AccountID)
+	token, err := s.createTokenFunc(requestBody.AccountID, requestBody.RoleIDs)
 	if err != nil {
 		errorsx.HTTPError(w, s.logger, errorsx.Wrap(err), http.StatusInternalServerError)
 		return
