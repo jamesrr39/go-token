@@ -40,11 +40,11 @@ func main() {
 	hmacSecret, err := base64x.DecodeBase64(bytes.NewBufferString(base64HmacSecret))
 	must.NoError(err)
 
-	createTokenFunc := func(accountID int64) (*gotoken.Token, errorsx.Error) {
+	createTokenFunc := func(accountID int64, roleIDs []int64) (*gotoken.Token, errorsx.Error) {
 		// no save to database here, just create a jwt token
 		tokenID := atomic.AddUint64(&lastTokenID, 1)
 
-		token := gotoken.NewToken(int64(tokenID), accountID, nil, time.Now())
+		token := gotoken.NewToken(int64(tokenID), accountID, roleIDs, time.Now())
 		log.Printf("created token: %#v\n", token)
 
 		return token, nil
@@ -65,7 +65,7 @@ func main() {
 
 	log.Printf("serving on %q\n", addr)
 	log.Printf(`try out some requests:
-curl -H 'Authorization: Bearer %s' -X POST --data '{"accountId": 123}' http://%s/api/admin/token/
+curl -H 'Authorization: Bearer %s' -X POST --data '{"accountId": 123, "roleIDs": [1, 3]}' http://%s/api/admin/token/
 
 curl -H 'Authorization: Bearer <token from response from request above>' http://%s/api/v1/a/b/c
 `,
@@ -76,11 +76,14 @@ curl -H 'Authorization: Bearer <token from response from request above>' http://
 func handleAllGet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	tokenID, err := webservice.GetIDFromCtx(ctx)
+	tokenID, err := gotoken.GetIDFromCtx(ctx)
 	must.NoError(err)
 
-	accountID, err := webservice.GetAccountIDFromCtx(ctx)
+	accountID, err := gotoken.GetAccountIDFromCtx(ctx)
 	must.NoError(err)
 
-	fmt.Fprintf(w, "hello, you are at %s. The token ID is %d and the account ID on the token is %d\n", r.URL.String(), tokenID, accountID)
+	roleIDs, err := gotoken.GetRoleIDsFromCtx(ctx)
+	must.NoError(err)
+
+	fmt.Fprintf(w, "hello, you are at %s. The token ID is %d, the account ID on the token is %d, and the token has role IDs %#v\n", r.URL.String(), tokenID, accountID, roleIDs)
 }
