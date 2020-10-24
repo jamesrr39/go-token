@@ -54,9 +54,9 @@ func AuthTokenMiddleWare(logger *logpkg.Logger, hmacSecret []byte) func(http.Han
 				roleIDs = append(roleIDs, int64(roleIDInterface.(float64)))
 			}
 
-			ctx = context.WithValue(ctx, tokenIDCtxKey, id)
-			ctx = context.WithValue(ctx, tokenAccountIDCtxKey, accountID)
-			ctx = context.WithValue(ctx, tokenRoleIDsCtxKey, roleIDs)
+			ctx = context.WithValue(ctx, gotoken.TokenIDCtxKey, id)
+			ctx = context.WithValue(ctx, gotoken.TokenAccountIDCtxKey, accountID)
+			ctx = context.WithValue(ctx, gotoken.TokenRoleIDsCtxKey, roleIDs)
 
 			r = r.WithContext(ctx)
 
@@ -65,56 +65,4 @@ func AuthTokenMiddleWare(logger *logpkg.Logger, hmacSecret []byte) func(http.Han
 
 		return http.HandlerFunc(fn)
 	}
-}
-
-type ctxKey struct {
-	Name string
-}
-
-var (
-	tokenIDCtxKey        = ctxKey{Name: "TokenID"}
-	tokenAccountIDCtxKey = ctxKey{Name: "AccountID"}
-	tokenRoleIDsCtxKey   = ctxKey{Name: "RoleIDs"}
-)
-
-func GetIDFromCtx(ctx context.Context) (int64, errorsx.Error) {
-	val := ctx.Value(tokenIDCtxKey)
-	if val == nil {
-		return 0, errorsx.Errorf("no tokenIDCtxKey found on context")
-	}
-
-	return val.(int64), nil
-}
-
-func GetAccountIDFromCtx(ctx context.Context) (int64, errorsx.Error) {
-	val := ctx.Value(tokenAccountIDCtxKey)
-	if val == nil {
-		return 0, errorsx.Errorf("no tokenAccountIDCtxKey found on context")
-	}
-
-	return val.(int64), nil
-}
-
-func GetRoleIDsFromCtx(ctx context.Context) ([]int64, errorsx.Error) {
-	val := ctx.Value(tokenRoleIDsCtxKey)
-	if val == nil {
-		return nil, errorsx.Errorf("no tokenRoleIDsCtxKey found on context")
-	}
-
-	return val.([]int64), nil
-}
-
-func HasRoleID(ctx context.Context, roleID int64) (bool, errorsx.Error) {
-	roleIDs, err := GetRoleIDsFromCtx(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	for _, roleIDOnCtx := range roleIDs {
-		if roleID == roleIDOnCtx {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }

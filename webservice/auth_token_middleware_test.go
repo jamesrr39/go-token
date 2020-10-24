@@ -72,13 +72,13 @@ func TestAuthMiddleWare(t *testing.T) {
 
 			var err error
 
-			receivedTokenID, err = GetIDFromCtx(ctx)
+			receivedTokenID, err = gotoken.GetIDFromCtx(ctx)
 			require.NoError(t, err)
 
-			receivedAccountID, err = GetAccountIDFromCtx(ctx)
+			receivedAccountID, err = gotoken.GetAccountIDFromCtx(ctx)
 			require.NoError(t, err)
 
-			receivedRoleIDs, err = GetRoleIDsFromCtx(ctx)
+			receivedRoleIDs, err = gotoken.GetRoleIDsFromCtx(ctx)
 			require.NoError(t, err)
 		})
 
