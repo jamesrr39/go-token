@@ -21,15 +21,16 @@ func (s *TokenStore) CreateToken(tx *sql.Tx, accountID int64, roleIDs []int64) (
 
 	token := &gotoken.Token{
 		AccountID: accountID,
+		RoleIDs:   roleIDs,
 		CreatedAt: time.Now().UTC(),
 	}
 
 	row := tx.QueryRow(`
-		INSERT INTO tokens (account_id, created_at)
+		INSERT INTO tokens (account_id, role_ids, created_at)
 		VALUES ($1, $2, $3) RETURNING id`,
 		accountID,
-		token.CreatedAt,
 		pq.Array(roleIDs),
+		token.CreatedAt,
 	)
 
 	err = row.Scan(&token.ID)
