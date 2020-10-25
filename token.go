@@ -17,8 +17,12 @@ const (
 )
 
 type Token struct {
-	ID        int64
+	// ID of the token (if required)
+	ID int64
+	// ID of the "account" the token belongs to (probably creaated by)
+	// This could be e.g. a user ID, or an organisation ID
 	AccountID int64
+	// RoleIDs the token has. This can be used the user has access to the endpoint they are trying to access
 	RoleIDs   []int64
 	CreatedAt time.Time
 }
