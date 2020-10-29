@@ -88,7 +88,7 @@ func TestAuthMiddleWare(t *testing.T) {
 		expectedAccountID := int64(40)
 		expectedRoleIDs := []int64{1, 54, 10}
 
-		token := gotoken.NewToken(expectedTokenID, expectedAccountID, expectedRoleIDs, time.Time{})
+		token := gotoken.NewToken(expectedTokenID, expectedAccountID, "", expectedRoleIDs, time.Time{})
 		jwtToken, err := token.ToJWTToken(hmacSecret)
 		require.NoError(t, err)
 

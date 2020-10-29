@@ -40,11 +40,11 @@ func main() {
 	hmacSecret, err := base64x.DecodeBase64(bytes.NewBufferString(base64HmacSecret))
 	must.NoError(err)
 
-	createTokenFunc := func(accountID int64, roleIDs []int64) (*gotoken.Token, errorsx.Error) {
+	createTokenFunc := func(accountID int64, name string, roleIDs []int64) (*gotoken.Token, errorsx.Error) {
 		// no save to database here, just create a jwt token
 		tokenID := atomic.AddUint64(&lastTokenID, 1)
 
-		token := gotoken.NewToken(int64(tokenID), accountID, roleIDs, time.Now())
+		token := gotoken.NewToken(int64(tokenID), accountID, name, roleIDs, time.Now())
 		log.Printf("created token: %#v\n", token)
 
 		return token, nil

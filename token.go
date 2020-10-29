@@ -22,13 +22,14 @@ type Token struct {
 	// ID of the "account" the token belongs to (probably creaated by)
 	// This could be e.g. a user ID, or an organisation ID
 	AccountID int64
+	Name      string
 	// RoleIDs the token has. This can be used the user has access to the endpoint they are trying to access
 	RoleIDs   []int64
 	CreatedAt time.Time
 }
 
-func NewToken(id, accountID int64, roleIDs []int64, createdAt time.Time) *Token {
-	return &Token{id, accountID, roleIDs, createdAt}
+func NewToken(id, accountID int64, name string, roleIDs []int64, createdAt time.Time) *Token {
+	return &Token{id, accountID, name, roleIDs, createdAt}
 }
 
 func (token *Token) ToJWTToken(hmacSecret []byte) (string, errorsx.Error) {
